@@ -4,7 +4,7 @@
 <h3 align="center">Pickle Rick</h3>
 <p align="center">A Rick and Morty CTF. Help turn Rick back into a human!</p>
 
-### Port Scanning
+## Port Scanning
 #### Command
 ```
 nmap -sC -A 10.10.193.242
@@ -50,9 +50,11 @@ HOP RTT     ADDRESS
 OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 20.86 seconds
 ```
-As we can see there is http port (port 80)
-### Searching the Website
+As we can see there is an http port open (port 80) which means this machine is using a webservice of some sort (website)
+
+## Searching the Website
 ![image](https://github.com/user-attachments/assets/3bece0ef-5cbe-4c7b-aa09-c550b784dfac)
+
 Looking at the source code of the website we can find a username as a comment
 ```
 <!DOCTYPE html>
@@ -93,12 +95,19 @@ Looking at the source code of the website we can find a username as a comment
 </body>
 </html>
 ```
-### Finding hidden directories
+## Finding Hidden Directories
 #### Command
 ```
 gobuster dir -u http://10.10.193.242 -w Tools/wordlists/dirb/common.txt -x php,sh, txt,cgi,html,css,js,py
 ```
-#### Commmand ahhaha
+#### Command Breakdown
+| Parameter   | Description                           |
+| :---------- | :---------------------------------- |
+| `dir` | Tells the mode so that the tool looks for directories and files on a website |
+| `-u` | Specifies the target URL |
+| `-w` | Specifies the wordlist to use for brute-forcing |
+| `-x` | Specifies file extensions to append to each word in the wordlist when making requests |
+
 #### Result
 ```
 ===============================================================
@@ -142,20 +151,32 @@ Progress: 18456 / 18460 (99.98%)
 Finished
 ===============================================================
 ```
+## Checking the Hidden Website Pages
 Checking http://10.10.193.242/robots.txt we can find the password: Wubbalubbadubdub
 
 Now going to http://10.10.193.242/login.php we can login using the username and password previously found
+
 ![image](https://github.com/user-attachments/assets/b27d413d-08b4-4c7c-8058-8da327bda376)
 
 Once we login we get prompted with a Command Panel
+
 ![image](https://github.com/user-attachments/assets/2cd691c9-544b-42b4-9104-862e39382754)
+
 Using ```ls``` shows us the contents we previously found and 2 new text files
+
 ![image](https://github.com/user-attachments/assets/7689a11d-3e5e-45be-942b-4b2a72fcc454)
+
 Going to http://10.10.193.242/Sup3rS3cretPickl3Ingred.txt we find the 1st Ingredient
+
 Now going to http://10.10.193.242/clue.txt tells us to look around the file system to find the other 2 ingredients
-Using ```ls /home``` we find a directory called rick, accessing that directory using ```ls /home/rick``` we find a file called "second ingredients" which if we use the command ```less '/home/rick/second ingredients' ``` we will get the 2nd Ingredient as the output (we use the command ```less``` because there are some banned commands we cannot use in this command panel like ```cat```)
-Now trying to access the /root folder instead of the home one using ```ls /root``` nothing shows up probably meaning we don't have priviliges
+
+Using ```ls /home``` we find a directory called rick, accessing that directory using ```ls /home/rick``` we find a file called "second ingredients" which if we use the command ```less '/home/rick/second ingredients'``` we will get the 2nd Ingredient as the output (we use the command ```less``` because there are some banned commands we cannot use in this command panel like for example ```cat```)
+
+Now trying to access the /root folder instead of the home one using ```ls /root``` we get nothing as the output, probably meaning we don't have priviliges
+
 Using the command ```sudo -l``` we were able to elevate our user priviliges and now we can use commands we didn't had priviliges to use and we only need to write "sudo " before the command, so doing ``` sudo ls /root``` shows us these files
+
 ![image](https://github.com/user-attachments/assets/36d02c06-320a-47e3-b23c-ec124e733e7c)
+
 Now doing ```sudo less /root/3rd.txt``` we find the 3rd and last ingredient as the output
 
